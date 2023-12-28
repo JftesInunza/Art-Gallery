@@ -1,0 +1,14 @@
+### Public API Request to get all picture with images.
+GET https://collectionapi.metmuseum.org//public/collection/v1/search?hasImages=true&title=true&q=any
+
+### Get all pictures with public images.
+GET http://localhost:3000/pictures
+
+### Public API Request to get an object by id.
+GET https://collectionapi.metmuseum.org//public/collection/v1/objects/205116
+
+### Get suspected object with no images.
+GET https://collectionapi.metmuseum.org//public/collection/v1/objects/478572
+
+### Get picture by id.
+GET http://localhost:3000/pictures/205116
