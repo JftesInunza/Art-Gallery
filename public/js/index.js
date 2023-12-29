@@ -17,50 +17,38 @@ const fetchPictures = async () => {
   }
 }
 
-const fetchPicture = async (id) => {
-  try {
-    const response = await fetch(`/pictures/${id}`)
-    const picture = await response.json()
-    return picture
-  } catch (error) {
-    throw APIResponseError
-  }
+const renderCard = async (id) => {
+  return new Promise((resolve, reject) => {
+    fetch(`/render/${id}`)
+      .then(response => {
+        if (!response.ok) reject(new Error('Invalid Object ID'))
+        return response.text()
+      })
+      .then(html => {
+        const card = document.createElement('div')
+        card.innerHTML = html
+        resolve(card)
+      })
+  })
 }
 
-const renderCard = async (picture) => {
-  try {
-    const request = '/render?' + new URLSearchParams(picture)
-    const response = await fetch(request)
-    const htmlStr = await response.text()
-    const node = document.createElement('div')
-    node.innerHTML = htmlStr
-    return node
-  } catch (error) {
-    throw APIResponseError
+const appendCards = async (n, { total, objectIDs }) => {
+  for (let i = lastPictureIdx; i < lastPictureIdx + n && i < total; i++) {
+    renderCard(objectIDs[i])
+      .then(card => gallery.appendChild(card))
+      .catch(() => {
+        lastPictureIdx++
+        appendCards(1, { total, objectIDs })
+      })
   }
-}
-
-const appendNextImages = async ({ total, objectIDs }) => {
-  const cards = []
-  for (let i = lastPictureIdx; i < lastPictureIdx + nextImages && i < total; i++) {
-    const picture = await fetchPicture(objectIDs[i])
-    if (!picture.title || !picture.department || !picture.pictureUrl) {
-      lastPictureIdx++
-      continue
-    }
-
-    const card = await renderCard(picture)
-    cards.push(card)
-  }
-  for (const card of cards) { gallery.appendChild(card) }
   lastPictureIdx += nextImages
 }
 
 window.addEventListener('load', async () => {
   pictures = await fetchPictures()
   btnLoadMore.addEventListener('click', async () => {
-    appendNextImages(pictures)
+    appendCards(nextImages, pictures)
   })
 
-  appendNextImages(pictures)
+  appendCards(nextImages, pictures)
 })
