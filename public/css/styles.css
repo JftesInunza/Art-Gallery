@@ -1,0 +1,47 @@
+.bg-gradient {
+    /* background: rgb(9,21,91);
+    background: linear-gradient(90deg, rgba(9,21,91,1) 0%, rgba(35,95,158,1) 25%, rgba(79,111,195,1) 50%, rgba(35,95,158,1) 75%, rgba(9,21,91,1) 100%); */
+    background-color: black;
+}
+
+.card {
+    overflow: hidden;
+    position: relative;
+    animation: reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 20% cover 30%;
+}
+
+.card-text {
+    color: rgb(252, 252, 220);
+    text-align: center;
+}
+
+.card-body {
+    background-color: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(5px);
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    transition: ease 0.3s;
+}
+
+.card-body:hover {
+    opacity: 1;
+}
+
+@keyframes reveal {
+    from {
+        opacity: 0.2;
+        scale: 0.75;
+        translate: 0 100px;
+    }
+    to {
+        opacity: 1;
+        scale: 1;
+        translate: 0 0;
+    }
+}

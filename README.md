@@ -1,16 +1,27 @@
 # art-gallery
 # Api DOC: https://metmuseum.github.io/
 
-To install dependencies:
+To install dependencies using bun:
 
 ```bash
-bun install
+bun install --production
 ```
+the --production option will ignore DevDependencies as eslint, bun-types.
 
-To run:
+To run with bun:
 
 ```bash
-bun run index.js
+bun start
 ```
 
-This project was created using `bun init` in bun v1.0.6. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+To install dependencies using npm:
+
+```bash
+npm install --omit=dev
+```
+
+To run with node:
+
+```bash
+node server.js
+```

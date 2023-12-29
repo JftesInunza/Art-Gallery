@@ -1,11 +1,17 @@
 const btnLoadMore = document.getElementById('btn-load-more')
-const gallery = document.getElementById('gallery')
+const gallery = [
+  document.getElementById('gl-col-1'),
+  document.getElementById('gl-col-2'),
+  document.getElementById('gl-col-3')
+]
 
 const nextImages = 20
 let lastPictureIdx = 0
+let galleryCounter = 0
 let pictures = null
 
-const APIResponseError = new Error('API Response Error')
+const APIResponseError = new Error('API Response Error. Try again later.')
+const InvalidObjectFetched = new Error('Invalid Object ID')
 
 const fetchPictures = async () => {
   try {
@@ -21,7 +27,7 @@ const renderCard = async (id) => {
   return new Promise((resolve, reject) => {
     fetch(`/render/${id}`)
       .then(response => {
-        if (!response.ok) reject(new Error('Invalid Object ID'))
+        if (!response.ok) reject(InvalidObjectFetched)
         return response.text()
       })
       .then(html => {
@@ -35,17 +41,24 @@ const renderCard = async (id) => {
 const appendCards = async (n, { total, objectIDs }) => {
   for (let i = lastPictureIdx; i < lastPictureIdx + n && i < total; i++) {
     renderCard(objectIDs[i])
-      .then(card => gallery.appendChild(card))
+      .then(card => {
+        const index = galleryCounter++ % gallery.length
+        gallery[index].appendChild(card)
+      })
       .catch(() => {
         lastPictureIdx++
         appendCards(1, { total, objectIDs })
       })
   }
-  lastPictureIdx += nextImages
+  lastPictureIdx += n
 }
 
 window.addEventListener('load', async () => {
-  pictures = await fetchPictures()
+  try {
+    pictures = await fetchPictures()
+  } catch (error) {
+    alert(error.message)
+  }
   btnLoadMore.addEventListener('click', async () => {
     appendCards(nextImages, pictures)
   })
