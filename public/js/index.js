@@ -5,7 +5,7 @@ const gallery = [
   document.getElementById('gl-col-3')
 ]
 
-const nextImages = 20
+const nextImages = 18
 let lastPictureIdx = 0
 let galleryCounter = 0
 let pictures = null
@@ -51,6 +51,7 @@ const appendCards = async (n, { total, objectIDs }) => {
       })
   }
   lastPictureIdx += n
+  if (lastPictureIdx >= total) btnLoadMore.style.display = 'none'
 }
 
 window.addEventListener('load', async () => {

@@ -9,6 +9,14 @@ const museumApiUrl =
   'https://collectionapi.metmuseum.org/public/collection/v1/'
 const port = process.env.PORT ?? 3000
 const app = express()
+let data = null
+
+const fetchData = async () => {
+  const request = museumApiUrl + '/search?isOnView=true&title=true&hasImages=true&q=portrait'
+  const response = await fetch(request)
+  const data = await response.json()
+  return data
+}
 
 app.use(express.static(__dirname + '/public'))
 
@@ -19,12 +27,8 @@ app.get('/', async (req, res) => {
 })
 
 app.get('/pictures', async (req, res) => {
-  fetch(
-    museumApiUrl + '/search?isOnView=true&title=true&hasImages=true&q=portrait'
-  )
-    .then((response) => response.json())
-    .then((pictures) => res.json(pictures))
-    .catch((error) => console.error('Error on fetching pictures', error))
+  if (!data) return res.status(500).json({ message: 'API not available. Try again later' })
+  res.json(data)
 })
 
 app.get('/render/:id', async (req, res) => {
@@ -50,6 +54,12 @@ app.get('/render/:id', async (req, res) => {
     })
 })
 
-app.listen(port, () => {
-  console.log(`Server running on port: ${port}`)
+app.listen(port, async () => {
+  try {
+    data = await fetchData()
+  } catch (error) {
+    console.error('Error on fetching pictures', error)
+  }
+  console.log(`Server running on http://localhost:${port}/`)
+  console.log(`Total objects fetched: ${data.total}`)
 })

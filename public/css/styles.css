@@ -1,7 +1,23 @@
-.bg-gradient {
-    /* background: rgb(9,21,91);
-    background: linear-gradient(90deg, rgba(9,21,91,1) 0%, rgba(35,95,158,1) 25%, rgba(79,111,195,1) 50%, rgba(35,95,158,1) 75%, rgba(9,21,91,1) 100%); */
+@import url('https://fonts.googleapis.com/css2?family=Lugrasimo&display=swap');
+
+
+body {
+    padding: 0;
+    margin: 0;
     background-color: black;
+}
+
+.bg-gradient {
+    background-color: black;
+}
+
+.title {
+    font-family: 'Lugrasimo', cursive;
+    font-size: 3rem;
+    font-weight: 800;
+    color: rgb(252, 252, 220);
+    margin-bottom: 2em;
+    text-transform: uppercase;
 }
 
 .card {
@@ -15,6 +31,7 @@
 .card-text {
     color: rgb(252, 252, 220);
     text-align: center;
+    font-family: 'Lugrasimo', cursive;
 }
 
 .card-body {
