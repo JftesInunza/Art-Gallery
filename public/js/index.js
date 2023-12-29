@@ -1,45 +1,66 @@
 const btnLoadMore = document.getElementById('btn-load-more')
 const gallery = document.getElementById('gallery')
 
-const nextImages = 10
+const nextImages = 20
 let lastPictureIdx = 0
-let data = null
+let pictures = null
 
-const appendCard = async (pictureId) => {
-  await fetch(`/pictures/${pictureId}`)
-    .then(response => response.text())
-    // TODO: validate if has images before append to html.
-    .then(htmlStr => {
-      const node = document.createElement('div')
-      node.innerHTML = htmlStr
-      gallery.appendChild(node)
-    })
-    .catch(error => { console.error('Could not fetch render picture', error) })
-}
+const APIResponseError = new Error('API Response Error')
 
-const fetchPictures = async (onLoad) => {
-  await fetch('/pictures')
-    .then(response => response.json())
-    .then(picture => {
-      data = picture
-      onLoad(picture)
-    })
-    .catch(error => { console.error('Could not fetch pictures', error) })
-}
-
-const appendNextImages = (pictures) => {
-  for (let i = lastPictureIdx; i < lastPictureIdx + nextImages; i++) {
-    const pictureId = pictures.objectIDs[i]
-    appendCard(pictureId)
+const fetchPictures = async () => {
+  try {
+    const response = await fetch('/pictures')
+    const pictures = await response.json()
+    return pictures
+  } catch (error) {
+    throw APIResponseError
   }
+}
+
+const fetchPicture = async (id) => {
+  try {
+    const response = await fetch(`/pictures/${id}`)
+    const picture = await response.json()
+    return picture
+  } catch (error) {
+    throw APIResponseError
+  }
+}
+
+const renderCard = async (picture) => {
+  try {
+    const request = '/render?' + new URLSearchParams(picture)
+    const response = await fetch(request)
+    const htmlStr = await response.text()
+    const node = document.createElement('div')
+    node.innerHTML = htmlStr
+    return node
+  } catch (error) {
+    throw APIResponseError
+  }
+}
+
+const appendNextImages = async ({ total, objectIDs }) => {
+  const cards = []
+  for (let i = lastPictureIdx; i < lastPictureIdx + nextImages && i < total; i++) {
+    const picture = await fetchPicture(objectIDs[i])
+    if (!picture.title || !picture.department || !picture.pictureUrl) {
+      lastPictureIdx++
+      continue
+    }
+
+    const card = await renderCard(picture)
+    cards.push(card)
+  }
+  for (const card of cards) { gallery.appendChild(card) }
   lastPictureIdx += nextImages
 }
 
-btnLoadMore.addEventListener('click', () => {
-  console.log('Button Load More')
-  if (!data) return
-  if (lastPictureIdx + nextImages >= data.total) return
-  appendNextImages(data)
-})
+window.addEventListener('load', async () => {
+  pictures = await fetchPictures()
+  btnLoadMore.addEventListener('click', async () => {
+    appendNextImages(pictures)
+  })
 
-fetchPictures(appendNextImages)
+  appendNextImages(pictures)
+})

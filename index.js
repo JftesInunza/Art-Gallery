@@ -18,9 +18,9 @@ app.get('/', async (req, res) => {
 })
 
 app.get('/pictures', async (req, res) => {
-  fetch(museumApiUrl + '/search?isOnView=true&title=true&hasImages=true&q=*')
+  fetch(museumApiUrl + '/search?isOnView=true&title=true&hasImages=true&q=portrait')
     .then(response => response.json())
-    .then(response => res.json(response))
+    .then(pictures => res.json(pictures))
     .catch(error => console.error('Error on fetching pictures', error))
 })
 
@@ -36,8 +36,19 @@ app.get('/pictures/:id', async (req, res) => {
         title: response.title
       }
     })
-    .then(picture => res.render(__dirname + '/views/partials/card', picture))
+    .then(picture => res.json(picture))
     .catch(error => console.error('Error on fetching pictures', error))
+})
+
+app.get('/render', async (req, res) => {
+  if (
+    !req.query.title ||
+    !req.query.department ||
+    !req.query.pictureUrl
+  ) {
+    res.json({ error: 'Not valid input' })
+  }
+  res.render(__dirname + '/views/partials/card', req.query)
 })
 
 app.listen(port, () => {
